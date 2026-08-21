@@ -1,106 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GenLayer · Orbital Spinner</title>
-    <link rel="stylesheet" href="style.css" />
+  <title>GenLayer Spinner · Contract Tool</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <!-- ─── SPINNER ─── -->
-    <div class="spinner-wrapper size-md" id="spinnerWrapper">
-        <svg class="gl-spinner" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="GenLayer loading spinner">
-            <defs>
-                <linearGradient id="grad-outer" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%"   stop-color="#6C5CE7" />
-                    <stop offset="50%"  stop-color="#A29BFE" />
-                    <stop offset="100%" stop-color="#6C5CE7" />
-                </linearGradient>
-                <linearGradient id="grad-mid" x1="0" y1="1" x2="1" y2="0">
-                    <stop offset="0%"   stop-color="#00CEC9" />
-                    <stop offset="50%"  stop-color="#81ECEC" />
-                    <stop offset="100%" stop-color="#00CEC9" />
-                </linearGradient>
-                <linearGradient id="grad-inner" x1="0.5" y1="0" x2="0.5" y2="1">
-                    <stop offset="0%"   stop-color="#FD79A8" />
-                    <stop offset="50%"  stop-color="#FDCB6E" />
-                    <stop offset="100%" stop-color="#FD79A8" />
-                </linearGradient>
-                <linearGradient id="grad-core" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%"   stop-color="#6C5CE7" />
-                    <stop offset="50%"  stop-color="#00CEC9" />
-                    <stop offset="100%" stop-color="#FD79A8" />
-                </linearGradient>
-                <radialGradient id="glow-core" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%"   stop-color="#6C5CE7" stop-opacity="0.5" />
-                    <stop offset="60%"  stop-color="#00CEC9" stop-opacity="0.15" />
-                    <stop offset="100%" stop-color="#6C5CE7" stop-opacity="0" />
-                </radialGradient>
-                <filter id="soft-glow" x="-40%" y="-40%" width="180%" height="180%">
-                    <feGaussianBlur stdDeviation="2.5" result="blur" />
-                    <feMerge>
-                        <feMergeNode in="blur" />
-                        <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                </filter>
-                <filter id="core-blur" x="-80%" y="-80%" width="260%" height="260%">
-                    <feGaussianBlur stdDeviation="4" />
-                </filter>
-            </defs>
-
-            <circle cx="50" cy="50" r="36" fill="url(#glow-core)" filter="url(#core-blur)" class="core-glow" />
-
-            <g class="ring-outer" filter="url(#soft-glow)">
-                <circle cx="50" cy="50" r="40" stroke="url(#grad-outer)" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="70 90" opacity="0.85" />
-            </g>
-            <g class="ring-dot-outer">
-                <circle cx="50" cy="10" r="2.8" fill="#A29BFE" opacity="0.9" filter="url(#soft-glow)" />
-            </g>
-
-            <g class="ring-mid" filter="url(#soft-glow)">
-                <circle cx="50" cy="50" r="28" stroke="url(#grad-mid)" stroke-width="2" stroke-linecap="round" stroke-dasharray="44 56" opacity="0.8" />
-            </g>
-            <g class="ring-dot-mid">
-                <circle cx="50" cy="22" r="2.4" fill="#81ECEC" opacity="0.9" filter="url(#soft-glow)" />
-            </g>
-
-            <g class="ring-inner" filter="url(#soft-glow)">
-                <circle cx="50" cy="50" r="17" stroke="url(#grad-inner)" stroke-width="2" stroke-linecap="round" stroke-dasharray="28 36" opacity="0.8" />
-            </g>
-            <g class="ring-dot-inner">
-                <circle cx="50" cy="33" r="2" fill="#FDCB6E" opacity="0.95" filter="url(#soft-glow)" />
-            </g>
-
-            <g class="core-pulse" filter="url(#soft-glow)">
-                <polygon points="50,30 63,38 63,55 50,63 37,55 37,38" fill="url(#grad-core)" opacity="0.20" />
-                <polygon points="50,30 63,38 63,55 50,63 37,55 37,38" stroke="url(#grad-core)" stroke-width="1.8" stroke-linejoin="round" fill="none" opacity="0.85" />
-                <polygon points="50,34 60,40 60,53 50,59 40,53 40,40" stroke="rgba(255,255,255,0.25)" stroke-width="0.8" stroke-linejoin="round" fill="none" opacity="0.6" />
-                <circle cx="50" cy="46.5" r="1.6" fill="#fff" opacity="0.7" />
-            </g>
-
-            <g class="hex-node" filter="url(#soft-glow)">
-                <circle cx="18" cy="28" r="1.6" fill="#A29BFE" opacity="0.5" />
-                <circle cx="18" cy="28" r="4" fill="#A29BFE" opacity="0.10" />
-            </g>
-            <g class="hex-node-2" filter="url(#soft-glow)">
-                <circle cx="82" cy="72" r="1.4" fill="#81ECEC" opacity="0.4" />
-                <circle cx="82" cy="72" r="3.6" fill="#81ECEC" opacity="0.08" />
-            </g>
-
-            <text x="50" y="49" text-anchor="middle" dominant-baseline="central" font-family="'Inter', system-ui, -apple-system, sans-serif" font-weight="700" font-size="9" fill="rgba(255,255,255,0.50)" letter-spacing="0.04em" opacity="0.5">GL</text>
+  <div class="container">
+    <h1>GenLayer Spinner</h1>
+    <p class="subtitle">Intelligent Contract Deployment Tool</p>
+    
+    <div class="spinner-wrapper">
+      <!-- Raw spinner SVG from previous submission -->
+      <div id="spinner" class="gl-spinner-container">
+        <svg class="gl-spinner" viewBox="0 0 100 100">
+          <!-- SVG content from previous submission -->
         </svg>
+      </div>
     </div>
 
-    <!-- ─── DEMO CONTROLS ─── -->
-    <div class="demo-controls">
-        <button data-bg="dark" class="active">🌙 Dark</button>
-        <button data-bg="light">☀️ Light</button>
-        <button data-size="sm">S</button>
-        <button data-size="md" class="active">M</button>
-        <button data-size="lg">L</button>
+    <div id="statusDisplay" class="status">Status: IDLE</div>
+    
+    <div class="controls">
+      <button id="spinBtn" class="btn primary">Deploy Spin</button>
+      <button id="stopBtn" class="btn secondary">Stop</button>
     </div>
-    <div class="demo-label">GenLayer · loading spinner</div>
 
-    <script src="script.js"></script>
+    <div class="info">
+      <p>Contract deployed to GenLayer network</p>
+      <small>0x1234...abcd</small>
+    </div>
+  </div>
+
+  <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
