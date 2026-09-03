@@ -1,224 +1,375 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GenLayer Spinner · UI Component</title>
-    <style>
-        /* ── reset ── */
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2rem;
-            background: #0b0d12;
-            transition: background 0.3s;
-        }
-        /* ── dark / light toggle (pure CSS) ── */
-        #bg-toggle:checked ~ body { background: #f5f6fa; }
-        #bg-toggle:checked ~ body .demo-label { color: #555; }
-        #bg-toggle:checked ~ body .control-label { color: #333; }
-        #bg-toggle:checked ~ body .size-btn { border-color: #ccc; color: #333; }
-        #bg-toggle:checked ~ body .size-btn.active { background: #e0e0e0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GenLayer Orbit · Consensus Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0b0d10; --s1:#12151a; --s2:#181c22; --b1:#20252c; --b2:#2a303a;
+    --amber:#e8a33d; --amberd:rgba(232,163,61,0.14); --amberl:rgba(232,163,61,0.32);
+    --teal:#3ddc97; --tealD:rgba(61,220,151,0.14);
+    --txt:#f2efe9; --sub:#9aa1ab; --mut:#5c636e; --red:#f0563f;
+    --radius:14px;
+  }
+  html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:'Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+  body{padding-bottom:64px}
+  a{color:inherit}
+  .wrap{max-width:640px;margin:0 auto;padding:0 20px}
 
-        /* ── spinner wrapper ── */
-        .spinner-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            border-radius: 32px;
-            transition: transform 0.2s;
-        }
-        /* size controls (no JS) */
-        .size-sm:checked ~ .spinner-wrapper { transform: scale(0.6); }
-        .size-md:checked ~ .spinner-wrapper { transform: scale(1); }
-        .size-lg:checked ~ .spinner-wrapper { transform: scale(1.4); }
+  /* ---------- top bar ---------- */
+  .tb{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--b1)}
+  .brand{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;letter-spacing:.01em}
+  .brand-mark{width:22px;height:22px;border-radius:7px;background:var(--amber);position:relative;flex:none}
+  .brand-mark::after{content:'';position:absolute;inset:5px;border-radius:3px;background:var(--bg)}
+  .netpill{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sub);border:1px solid var(--b2);border-radius:100px;padding:6px 11px}
+  .netdot{width:6px;height:6px;border-radius:50%;background:var(--teal)}
 
-        /* ── SVG spinner (exactly the same as before) ── */
-        .gl-spinner {
-            display: block;
-            width: 100px;
-            height: 100px;
-            overflow: visible;
-        }
+  /* ---------- hero / orbit ---------- */
+  .hero{padding:40px 20px 8px;text-align:center}
+  .eyebrow{font-size:12px;color:var(--sub);margin-bottom:10px}
+  .htitle{font-size:clamp(24px,6vw,32px);font-weight:700;line-height:1.15;letter-spacing:-.02em;margin-bottom:10px}
+  .htitle span{color:var(--amber)}
+  .hdesc{font-size:14px;color:var(--sub);line-height:1.6;max-width:420px;margin:0 auto 32px}
 
-        /* animations */
-        .ring-outer { animation: spin-cw 4.2s linear infinite; transform-origin: center; }
-        .ring-mid { animation: spin-ccw 3.0s linear infinite; transform-origin: center; }
-        .ring-inner { animation: spin-cw 1.8s linear infinite; transform-origin: center; }
-        .ring-dot-outer { animation: orbit-cw 4.2s linear infinite; transform-origin: center; }
-        .ring-dot-mid { animation: orbit-ccw 3.0s linear infinite; transform-origin: center; }
-        .ring-dot-inner { animation: orbit-cw 1.8s linear infinite; transform-origin: center; }
-        .core-pulse { animation: pulse-core 2.4s ease-in-out infinite; transform-origin: center; }
-        .core-glow { animation: glow-pulse 2.4s ease-in-out infinite; transform-origin: center; }
-        .hex-node { animation: hex-drift 5.6s ease-in-out infinite; transform-origin: center; }
-        .hex-node-2 { animation: hex-drift-2 6.8s ease-in-out infinite; transform-origin: center; }
+  .orbitbox{position:relative;width:270px;height:270px;margin:0 auto 8px}
+  .ring{position:absolute;border-radius:50%;border:1px solid var(--b2)}
+  .ring1{inset:0}
+  .ring2{inset:34px}
+  .ring3{inset:68px}
+  .core{position:absolute;inset:104px;border-radius:50%;background:var(--s2);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;transition:border-color .4s,box-shadow .4s}
+  .core-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mut);letter-spacing:.06em}
+  .core-val{font-size:13px;font-weight:600}
+  .core.live{border-color:var(--amberl);box-shadow:0 0 24px var(--amberd)}
+  .core.done{border-color:var(--teal);box-shadow:0 0 28px var(--tealD)}
+  .core.fail{border-color:var(--red);box-shadow:0 0 24px rgba(240,86,63,.18)}
 
-        @keyframes spin-cw { to { transform: rotate(360deg); } }
-        @keyframes spin-ccw { to { transform: rotate(-360deg); } }
-        @keyframes orbit-cw { to { transform: rotate(360deg); } }
-        @keyframes orbit-ccw { to { transform: rotate(-360deg); } }
-        @keyframes pulse-core { 0%,100% { transform:scale(1); opacity:.8; } 50% { transform:scale(1.18); opacity:1; } }
-        @keyframes glow-pulse { 0%,100% { opacity:.3; r:12; } 50% { opacity:.7; r:18; } }
-        @keyframes hex-drift { 0%,100% { transform:translate(0,0) rotate(0); opacity:.6; } 33% { transform:translate(2px,-3px) rotate(12deg); opacity:1; } 66% { transform:translate(-2px,2px) rotate(-6deg); opacity:.8; } }
-        @keyframes hex-drift-2 { 0%,100% { transform:translate(0,0) rotate(0); opacity:.4; } 50% { transform:translate(-3px,2px) rotate(-10deg); opacity:.9; } }
+  .validator{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--s1);border:1px solid var(--b2);top:50%;left:50%;margin:-8px;display:flex;align-items:center;justify-content:center;transition:border-color .35s,background .35s,box-shadow .35s}
+  .validator::after{content:'';width:5px;height:5px;border-radius:50%;background:var(--mut);transition:background .35s}
+  .validator.voted{border-color:var(--amber);background:var(--amberd)}
+  .validator.voted::after{background:var(--amber)}
+  .validator.voted.approve{border-color:var(--teal);background:var(--tealD)}
+  .validator.voted.approve::after{background:var(--teal)}
+  .validator.voted.reject{border-color:var(--red);background:rgba(240,86,63,.12)}
+  .validator.voted.reject::after{background:var(--red)}
 
-        /* ── demo controls (no JS) ── */
-        .controls {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-        }
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .control-label {
-            color: rgba(255,255,255,0.6);
-            font-size: 0.75rem;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
-        .size-btn {
-            display: inline-block;
-            padding: 0.4rem 1rem;
-            border-radius: 40px;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: transparent;
-            color: rgba(255,255,255,0.6);
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: 0.2s;
-            text-align: center;
-        }
-        .size-btn.active {
-            background: rgba(120,100,255,0.2);
-            border-color: rgba(120,100,255,0.4);
-            color: #fff;
-        }
-        input[type="radio"], input[type="checkbox"] { display: none; }
+  .spin1{animation:orbit 7s linear infinite}
+  .spin2{animation:orbit 11s linear infinite reverse}
+  .spin3{animation:orbit 15s linear infinite}
+  @keyframes orbit{from{transform:rotate(0deg) translateX(var(--r)) rotate(0deg)}to{transform:rotate(360deg) translateX(var(--r)) rotate(-360deg)}}
+  @media (prefers-reduced-motion:reduce){.spin1,.spin2,.spin3{animation:none}}
 
-        /* dark mode label */
-        .toggle-label {
-            padding: 0.4rem 1.2rem;
-            border-radius: 40px;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: transparent;
-            color: rgba(255,255,255,0.6);
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .toggle-label:hover { background: rgba(255,255,255,0.05); }
+  /* ---------- panel ---------- */
+  .panel{background:var(--s1);border:1px solid var(--b1);border-radius:var(--radius);padding:20px;margin-top:28px}
+  .panel + .panel{margin-top:14px}
+  .field-lbl{font-size:11px;color:var(--sub);margin-bottom:7px;display:block}
+  .field-row{display:flex;gap:8px}
+  input.addr{flex:1;background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:11px 12px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:12.5px}
+  input.addr:focus{outline:none;border-color:var(--amberl)}
+  input.addr::placeholder{color:var(--mut)}
+  .dice{width:42px;flex:none;background:var(--s2);border:1px solid var(--b2);border-radius:10px;color:var(--sub);font-size:15px;cursor:pointer}
+  .dice:hover{border-color:var(--amberl);color:var(--amber)}
 
-        .demo-label {
-            color: rgba(255,255,255,0.3);
-            font-size: 0.7rem;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            margin-top: 0.5rem;
-        }
+  .netrow{display:flex;gap:8px;margin-top:12px}
+  .netbtn{flex:1;padding:9px 6px;border-radius:9px;border:1px solid var(--b2);background:transparent;color:var(--sub);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;transition:.2s}
+  .netbtn.on{border-color:var(--amberl);background:var(--amberd);color:var(--amber)}
 
-        /* responsive */
-        @media (max-width: 480px) {
-            .gl-spinner { width: 72px; height: 72px; }
-            .controls { gap: 1rem; }
-        }
-    </style>
+  .runbtn{width:100%;margin-top:16px;padding:13px;border-radius:10px;border:1px solid var(--amberl);background:var(--amberd);color:var(--amber);font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:.2s}
+  .runbtn:hover{background:rgba(232,163,61,.24)}
+  .runbtn:disabled{opacity:.45;cursor:not-allowed}
+  .hint{font-size:11px;color:var(--mut);margin-top:10px;line-height:1.5}
+
+  /* ---------- steps ---------- */
+  .steps{display:flex;flex-direction:column;gap:0;margin-top:4px}
+  .step{display:flex;align-items:flex-start;gap:12px;padding:10px 0;position:relative}
+  .step:not(:last-child)::before{content:'';position:absolute;left:11px;top:32px;bottom:-4px;width:1px;background:var(--b2)}
+  .sdot{width:23px;height:23px;border-radius:50%;border:1px solid var(--b2);background:var(--s2);flex:none;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);transition:.3s}
+  .step.active .sdot{border-color:var(--amber);color:var(--amber);animation:pulse 1.3s ease-in-out infinite}
+  .step.done .sdot{border-color:var(--teal);background:var(--tealD);color:var(--teal)}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--amberd)}50%{box-shadow:0 0 0 5px transparent}}
+  .stxt{padding-top:2px}
+  .st-h{font-size:13px;font-weight:600}
+  .st-p{font-size:11.5px;color:var(--mut);margin-top:2px}
+
+  /* ---------- result ---------- */
+  .result{display:none;margin-top:14px}
+  .result.show{display:block}
+  .rhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .rtag{font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 10px;border-radius:100px;border:1px solid var(--teal);color:var(--teal);background:var(--tealD)}
+  .rtag.reject{border-color:var(--red);color:var(--red);background:rgba(240,86,63,.1)}
+  .rvotes{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .rv{aspect-ratio:1;border-radius:8px;border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut)}
+  .rv.approve{border-color:var(--teal);color:var(--teal);background:var(--tealD)}
+  .rv.reject{border-color:var(--red);color:var(--red);background:rgba(240,86,63,.1)}
+
+  /* ---------- history ---------- */
+  .htitle2{font-size:12px;color:var(--sub);margin-bottom:10px}
+  .hrow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b1);font-size:12px}
+  .hrow:last-child{border-bottom:none}
+  .hleft{display:flex;flex-direction:column;gap:2px}
+  .haddr{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--sub)}
+  .htime{font-size:10.5px;color:var(--mut)}
+  .hstate{font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:3px 9px;border-radius:100px;border:1px solid var(--teal);color:var(--teal)}
+  .hstate.reject{border-color:var(--red);color:var(--red)}
+  .empty{font-size:12px;color:var(--mut);text-align:center;padding:18px 0}
+
+  /* ---------- component export ---------- */
+  .codewrap{position:relative;background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:14px;margin-top:12px;overflow-x:auto}
+  .codewrap pre{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--sub);line-height:1.6;white-space:pre}
+  .copybtn{position:absolute;top:10px;right:10px;background:var(--s1);border:1px solid var(--b2);color:var(--sub);font-size:10.5px;font-family:'JetBrains Mono',monospace;padding:5px 10px;border-radius:7px;cursor:pointer}
+  .copybtn:hover{border-color:var(--amberl);color:var(--amber)}
+  .copybtn.copied{border-color:var(--teal);color:var(--teal)}
+
+  .foot{text-align:center;padding:26px 20px 6px;font-size:11px;color:var(--mut);line-height:1.7}
+  .foot b{color:var(--sub)}
+</style>
 </head>
 <body>
 
-    <!-- hidden inputs for toggles -->
-    <input type="checkbox" id="bg-toggle" checked />
-    <input type="radio" name="size" id="size-sm" />
-    <input type="radio" name="size" id="size-md" checked />
-    <input type="radio" name="size" id="size-lg" />
+<div class="tb">
+  <div class="brand"><span class="brand-mark"></span>GenLayer Orbit</div>
+  <div class="netpill"><span class="netdot"></span>Simulated · Bradbury Testnet</div>
+</div>
 
-    <!-- spinner -->
-    <div class="spinner-wrapper">
-        <svg class="gl-spinner" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="grad-outer" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#6C5CE7"/><stop offset="50%" stop-color="#A29BFE"/><stop offset="100%" stop-color="#6C5CE7"/>
-                </linearGradient>
-                <linearGradient id="grad-mid" x1="0" y1="1" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#00CEC9"/><stop offset="50%" stop-color="#81ECEC"/><stop offset="100%" stop-color="#00CEC9"/>
-                </linearGradient>
-                <linearGradient id="grad-inner" x1="0.5" y1="0" x2="0.5" y2="1">
-                    <stop offset="0%" stop-color="#FD79A8"/><stop offset="50%" stop-color="#FDCB6E"/><stop offset="100%" stop-color="#FD79A8"/>
-                </linearGradient>
-                <linearGradient id="grad-core" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#6C5CE7"/><stop offset="50%" stop-color="#00CEC9"/><stop offset="100%" stop-color="#FD79A8"/>
-                </linearGradient>
-                <radialGradient id="glow-core" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#6C5CE7" stop-opacity="0.5"/><stop offset="60%" stop-color="#00CEC9" stop-opacity="0.15"/><stop offset="100%" stop-color="#6C5CE7" stop-opacity="0"/>
-                </radialGradient>
-                <filter id="soft-glow" x="-40%" y="-40%" width="180%" height="180%">
-                    <feGaussianBlur stdDeviation="2.5"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                </filter>
-                <filter id="core-blur" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="4"/></filter>
-            </defs>
+<div class="wrap">
 
-            <circle cx="50" cy="50" r="36" fill="url(#glow-core)" filter="url(#core-blur)" class="core-glow"/>
-            <g class="ring-outer" filter="url(#soft-glow)">
-                <circle cx="50" cy="50" r="40" stroke="url(#grad-outer)" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="70 90" opacity="0.85"/>
-            </g>
-            <g class="ring-dot-outer"><circle cx="50" cy="10" r="2.8" fill="#A29BFE" opacity="0.9" filter="url(#soft-glow)"/></g>
-            <g class="ring-mid" filter="url(#soft-glow)">
-                <circle cx="50" cy="50" r="28" stroke="url(#grad-mid)" stroke-width="2" stroke-linecap="round" stroke-dasharray="44 56" opacity="0.8"/>
-            </g>
-            <g class="ring-dot-mid"><circle cx="50" cy="22" r="2.4" fill="#81ECEC" opacity="0.9" filter="url(#soft-glow)"/></g>
-            <g class="ring-inner" filter="url(#soft-glow)">
-                <circle cx="50" cy="50" r="17" stroke="url(#grad-inner)" stroke-width="2" stroke-linecap="round" stroke-dasharray="28 36" opacity="0.8"/>
-            </g>
-            <g class="ring-dot-inner"><circle cx="50" cy="33" r="2" fill="#FDCB6E" opacity="0.95" filter="url(#soft-glow)"/></g>
-            <g class="core-pulse" filter="url(#soft-glow)">
-                <polygon points="50,30 63,38 63,55 50,63 37,55 37,38" fill="url(#grad-core)" opacity="0.2"/>
-                <polygon points="50,30 63,38 63,55 50,63 37,55 37,38" stroke="url(#grad-core)" stroke-width="1.8" stroke-linejoin="round" fill="none" opacity="0.85"/>
-                <polygon points="50,34 60,40 60,53 50,59 40,53 40,40" stroke="rgba(255,255,255,0.25)" stroke-width="0.8" stroke-linejoin="round" fill="none" opacity="0.6"/>
-                <circle cx="50" cy="46.5" r="1.6" fill="#fff" opacity="0.7"/>
-            </g>
-            <g class="hex-node" filter="url(#soft-glow)">
-                <circle cx="18" cy="28" r="1.6" fill="#A29BFE" opacity="0.5"/>
-                <circle cx="18" cy="28" r="4" fill="#A29BFE" opacity="0.1"/>
-            </g>
-            <g class="hex-node-2" filter="url(#soft-glow)">
-                <circle cx="82" cy="72" r="1.4" fill="#81ECEC" opacity="0.4"/>
-                <circle cx="82" cy="72" r="3.6" fill="#81ECEC" opacity="0.08"/>
-            </g>
-            <text x="50" y="49" text-anchor="middle" dominant-baseline="central" font-family="system-ui, sans-serif" font-weight="700" font-size="9" fill="rgba(255,255,255,0.5)" letter-spacing="0.04em" opacity="0.5">GL</text>
-        </svg>
+  <div class="hero">
+    <div class="eyebrow">Consensus visualization for Intelligent Contracts</div>
+    <h1 class="htitle">Watch validators <span>reach consensus</span>,<br>not just a spinner turn.</h1>
+    <p class="hdesc">A loading state built for GenLayer: each orbiting node is a validator, and the center resolves only once quorum is actually reached.</p>
+
+    <div class="orbitbox" id="orbitbox">
+      <div class="ring ring1"></div>
+      <div class="ring ring2"></div>
+      <div class="ring ring3"></div>
+      <div class="core" id="core">
+        <div class="core-lbl">CONTRACT</div>
+        <div class="core-val" id="coreVal">Idle</div>
+      </div>
+      <!-- validators positioned by JS -->
+    </div>
+  </div>
+
+  <div class="panel">
+    <span class="field-lbl">Contract address</span>
+    <div class="field-row">
+      <input class="addr" id="addrInput" placeholder="0x..." value="0x0D1A1f2889897cFCb440A194fedaeC131101E0E8">
+      <button class="dice" id="diceBtn" title="Use a sample address">⟳</button>
     </div>
 
-    <!-- pure CSS controls -->
-    <div class="controls">
-        <div class="control-group">
-            <span class="control-label">Background</span>
-            <label for="bg-toggle" class="toggle-label" id="bgLabel">Dark</label>
-        </div>
-        <div class="control-group">
-            <span class="control-label">Size</span>
-            <label for="size-sm" class="size-btn">S</label>
-            <label for="size-md" class="size-btn active">M</label>
-            <label for="size-lg" class="size-btn">L</label>
-        </div>
+    <div class="netrow">
+      <button class="netbtn on" data-net="Bradbury Testnet">Bradbury Testnet</button>
+      <button class="netbtn" data-net="Asimov Mainnet">Asimov Mainnet</button>
+      <button class="netbtn" data-net="Local Studio">Local Studio</button>
     </div>
-    <div class="demo-label">GenLayer · UI component · no JavaScript</div>
 
-    <!-- update active state of size labels (pure CSS trick) -->
-    <script>
-        // smallest JS to sync active classes – but you said no JS, so we can remove this.
-        // Actually we can do it with CSS only using :checked ~ and sibling selectors,
-        // but that requires restructuring. Let's keep this minimal and remove the script.
-        // We'll just use CSS based on checked state.
-    </script>
+    <button class="runbtn" id="runBtn">Simulate consensus round</button>
+    <p class="hint">Demo only — this never sends a transaction, requests a signature, or reads a real chain. It's a reusable status pattern you can wire to your app's actual GenLayer calls.</p>
+  </div>
+
+  <div class="panel">
+    <div class="steps" id="steps">
+      <div class="step" data-step="0">
+        <div class="sdot">1</div>
+        <div class="stxt"><div class="st-h">Broadcast</div><div class="st-p">Transaction submitted to the network</div></div>
+      </div>
+      <div class="step" data-step="1">
+        <div class="sdot">2</div>
+        <div class="stxt"><div class="st-h">Validator review</div><div class="st-p">Nodes independently execute and vote</div></div>
+      </div>
+      <div class="step" data-step="2">
+        <div class="sdot">3</div>
+        <div class="stxt"><div class="st-h">Consensus check</div><div class="st-p">Votes tallied against quorum threshold</div></div>
+      </div>
+      <div class="step" data-step="3">
+        <div class="sdot">4</div>
+        <div class="stxt"><div class="st-h">Finalized</div><div class="st-p">Result committed and ready to read</div></div>
+      </div>
+    </div>
+
+    <div class="result" id="result">
+      <div class="rhead">
+        <span style="font-size:12px;color:var(--sub)">Validator votes</span>
+        <span class="rtag" id="rtag">Accepted</span>
+      </div>
+      <div class="rvotes" id="rvotes"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="htitle2">Recent rounds</div>
+    <div id="history"><div class="empty">No rounds run yet — simulate one above.</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="htitle2">Use this spinner in your own dApp</div>
+    <div class="codewrap">
+      <button class="copybtn" id="copyBtn">Copy</button>
+      <pre id="codeblock">&lt;div class="glorbit"&gt;
+  &lt;div class="glring"&gt;&lt;/div&gt;
+  &lt;div class="glcore"&gt;Pending&lt;/div&gt;
+  &lt;div class="glnode"&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+.glorbit{position:relative;width:64px;height:64px}
+.glring{position:absolute;inset:0;border-radius:50%;
+  border:2px solid #2a303a;border-top-color:#e8a33d;
+  animation:glspin 1s linear infinite}
+@keyframes glspin{to{transform:rotate(360deg)}}</pre>
+    </div>
+    <p class="hint">Full component (with the multi-node consensus variant above) is single-file, dependency-free, and safe on dark or light backgrounds.</p>
+  </div>
+
+</div>
+
+<div class="foot">Built for the GenLayer ecosystem · <b>connects the visual to real Intelligent Contract lifecycle states</b> instead of standing alone as an asset.</div>
+
+<script>
+(function(){
+  const orbitbox = document.getElementById('orbitbox');
+  const core = document.getElementById('core');
+  const coreVal = document.getElementById('coreVal');
+  const runBtn = document.getElementById('runBtn');
+  const addrInput = document.getElementById('addrInput');
+  const diceBtn = document.getElementById('diceBtn');
+  const steps = document.querySelectorAll('.step');
+  const result = document.getElementById('result');
+  const rtag = document.getElementById('rtag');
+  const rvotes = document.getElementById('rvotes');
+  const history = document.getElementById('history');
+  const copyBtn = document.getElementById('copyBtn');
+  const netBtns = document.querySelectorAll('.netbtn');
+
+  const VALIDATOR_COUNT = 5;
+  const RADII = [0,1,2,0,1]; // ring index per validator
+  const ringPx = [0,17,34]; // half-diameters for translateX (ring1 inset0->r135; ring2 inset34->r101; ring3 inset68->r67)
+  const R = [135,101,67];
+  const runs = [];
+  let currentNetwork = 'Bradbury Testnet';
+
+  // build validator nodes
+  for(let i=0;i<VALIDATOR_COUNT;i++){
+    const v = document.createElement('div');
+    v.className = 'validator';
+    const ring = i % 3;
+    const spinClass = ring===0?'spin1':ring===1?'spin2':'spin3';
+    v.classList.add(spinClass);
+    const startAngle = (360/VALIDATOR_COUNT)*i;
+    v.style.setProperty('--r', R[ring]+'px');
+    v.style.transform = `rotate(${startAngle}deg) translateX(${R[ring]}px)`;
+    v.dataset.index = i;
+    orbitbox.appendChild(v);
+  }
+
+  netBtns.forEach(b=>{
+    b.addEventListener('click', ()=>{
+      netBtns.forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      currentNetwork = b.dataset.net;
+    });
+  });
+
+  diceBtn.addEventListener('click', ()=>{
+    const rand = '0x' + Array.from({length:40},()=> '0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+    addrInput.value = rand;
+  });
+
+  function resetSteps(){
+    steps.forEach(s=>s.classList.remove('active','done'));
+    core.classList.remove('live','done','fail');
+    document.querySelectorAll('.validator').forEach(v=>v.classList.remove('voted','approve','reject'));
+    result.classList.remove('show');
+    coreVal.textContent = 'Idle';
+  }
+
+  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+  async function runRound(){
+    if(!addrInput.value.trim()){ addrInput.focus(); return; }
+    runBtn.disabled = true;
+    resetSteps();
+    core.classList.add('live');
+    coreVal.textContent = 'Broadcasting';
+
+    steps[0].classList.add('active');
+    await sleep(650);
+    steps[0].classList.remove('active'); steps[0].classList.add('done');
+
+    steps[1].classList.add('active');
+    coreVal.textContent = 'Voting';
+    const validators = Array.from(document.querySelectorAll('.validator'));
+    const outcomes = validators.map(()=> Math.random() > 0.18); // mostly approve
+    for(let i=0;i<validators.length;i++){
+      await sleep(380);
+      validators[i].classList.add('voted', outcomes[i] ? 'approve' : 'reject');
+    }
+    steps[1].classList.remove('active'); steps[1].classList.add('done');
+
+    steps[2].classList.add('active');
+    coreVal.textContent = 'Tallying';
+    await sleep(600);
+    steps[2].classList.remove('active'); steps[2].classList.add('done');
+
+    const approveCount = outcomes.filter(Boolean).length;
+    const passed = approveCount >= Math.ceil(VALIDATOR_COUNT * 0.6);
+
+    steps[3].classList.add('active');
+    await sleep(450);
+    steps[3].classList.remove('active'); steps[3].classList.add('done');
+
+    core.classList.remove('live');
+    core.classList.add(passed ? 'done' : 'fail');
+    coreVal.textContent = passed ? 'Finalized' : 'Rejected';
+
+    rtag.textContent = passed ? 'Accepted' : 'Rejected';
+    rtag.classList.toggle('reject', !passed);
+    rvotes.innerHTML = '';
+    outcomes.forEach((ok,i)=>{
+      const d = document.createElement('div');
+      d.className = 'rv ' + (ok?'approve':'reject');
+      d.textContent = 'V'+(i+1);
+      rvotes.appendChild(d);
+    });
+    result.classList.add('show');
+
+    runs.unshift({ addr: addrInput.value.trim(), net: currentNetwork, passed, time: new Date() });
+    renderHistory();
+    runBtn.disabled = false;
+  }
+
+  function short(a){ return a.length > 14 ? a.slice(0,8)+'…'+a.slice(-6) : a; }
+  function timeAgo(){ return 'just now'; }
+
+  function renderHistory(){
+    if(runs.length === 0){
+      history.innerHTML = '<div class="empty">No rounds run yet — simulate one above.</div>';
+      return;
+    }
+    history.innerHTML = runs.slice(0,6).map(r => `
+      <div class="hrow">
+        <div class="hleft">
+          <span class="haddr">${short(r.addr)}</span>
+          <span class="htime">${r.net} · just now</span>
+        </div>
+        <span class="hstate ${r.passed?'':'reject'}">${r.passed?'Accepted':'Rejected'}</span>
+      </div>
+    `).join('');
+  }
+
+  runBtn.addEventListener('click', runRound);
+
+  copyBtn.addEventListener('click', ()=>{
+    const text = document.getElementById('codeblock').textContent;
+    navigator.clipboard.writeText(text).then(()=>{
+      copyBtn.textContent = 'Copied';
+      copyBtn.classList.add('copied');
+      setTimeout(()=>{ copyBtn.textContent='Copy'; copyBtn.classList.remove('copied'); }, 1600);
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
