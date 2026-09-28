@@ -4,7 +4,7 @@ A clean loading state UI for the GenLayer Portal with the official GenLayer logo
 
 ## Live Demo
 
-Open `genlayer-spinner.html` directly in any browser — no server needed.
+Open `johnfinley2f.github.io/Genlayer/` directly in any browser - no server needed.
 
 ## What it does
 
@@ -12,7 +12,7 @@ Open `genlayer-spinner.html` directly in any browser — no server needed.
 2. Official GenLayer logo pulses with a smooth animation
 3. "Loading Portal" text with animated dots
 4. Smooth fade out after 2.8 seconds
-5. Portal content fades in — navbar, stats, recent transactions
+5. Portal content fades in - navbar, stats, recent transactions
 
 ## Preview
 
